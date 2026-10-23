@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink – Location-Based Blood and Organ Donor Matching and Emergency Alert System</title>
+  
+  <!-- Leaflet GIS Map Stylesheet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  
+  <!-- Project Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ========================================================================
+       Navigation Bar
+       ======================================================================== -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand" data-view="view-home">
+        <div class="brand-icon">🩸</div>
+        <div class="brand-info">
+          <h1>LifeLink <span class="badge-tech">v2.4 Core</span></h1>
+          <p>Location-Based Blood & Organ Matching System</p>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a class="nav-link active" data-view="view-home">🏠 Home</a></li>
+          <li><a class="nav-link" data-view="view-donor-register">🩸 Register Donor</a></li>
+          <li><a class="nav-link emergency-btn" data-view="view-emergency">🚨 Emergency Request</a></li>
+          <li><a class="nav-link" data-view="view-matching">⚡ Live Matching</a></li>
+          <li><a class="nav-link" data-view="view-donors">📋 Donor Directory</a></li>
+          <li><a class="nav-link" data-view="view-alerts">🔔 Alert Logs</a></li>
+          <li><a class="nav-link" data-view="view-about">📖 How It Works</a></li>
+          <li><a class="nav-link" data-view="view-database">🗄️ Database Inspector</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       Main Content Views
+       ======================================================================== -->
+  <main class="main-wrapper">
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 1: HOME PAGE
+         ---------------------------------------------------------------------- -->
+    <section id="view-home" class="view-section active">
+      <!-- Hero Banner -->
+      <div class="hero-card">
+        <div class="hero-tag">
+          <span>● COLLEGE SEMESTER PROJECT</span>
+          <span>•</span>
+          <span>HEALTHCARE GIS & MEDICAL INFORMATICS</span>
+        </div>
+        <h2 class="hero-title">
+          Location-Based Blood & Organ Donor Matching <br><span>& Emergency Alert System</span>
+        </h2>
+        <p class="hero-desc">
+          LifeLink connects patients requiring critical transfusions or organ transplants with compatible, 
+          nearby registered donors in real time using the mathematical Haversine distance formula, 
+          strict ABO/Rh blood compatibility matrix, and an automated emergency alert dispatch engine.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-danger btn-lg" data-view="view-emergency">
+            🚨 Emergency Request
+          </button>
+          <button class="btn btn-primary btn-lg" data-view="view-donor-register">
+            🩸 Register as Donor
+          </button>
+          <button class="btn btn-outline btn-lg" data-view="view-donors">
+            🔍 Find Donors
+          </button>
+        </div>
+
+        <!-- Live Statistics Counter -->
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-icon">👥</div>
+            <div>
+              <div class="stat-value" id="stat-total-donors">0</div>
+              <div class="stat-label">Registered Donors</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">🟢</div>
+            <div>
+              <div class="stat-value" id="stat-available-donors">0</div>
+              <div class="stat-label">Available for Dispatch</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">🫀</div>
+            <div>
+              <div class="stat-value" id="stat-organ-donors">0</div>
+              <div class="stat-label">Organ Donors</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">🚨</div>
+            <div>
+              <div class="stat-value" id="stat-critical-requests">0</div>
+              <div class="stat-label">Critical Requests</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Workflow: Register -> Request -> Match -> Alert -->
+      <div class="workflow-section">
+        <div class="section-heading">
+          <h3>How LifeLink Works</h3>
+          <p>The 4-step emergency workflow engineered for rapid response and clinical accuracy.</p>
+        </div>
+
+        <div class="workflow-grid">
+          <div class="workflow-card">
+            <span class="workflow-step-num">STEP 1</span>
+            <div class="workflow-icon">📝</div>
+            <h4>1. Register</h4>
+            <p>Donors register their blood group, organ donation consent, current coordinates, and contact details in the secure database.</p>
+          </div>
+
+          <div class="workflow-card">
+            <span class="workflow-step-num">STEP 2</span>
+            <div class="workflow-icon">🚑</div>
+            <h4>2. Request</h4>
+            <p>Hospitals or patient caretakers submit an emergency request detailing blood group, required organ, location, and urgency.</p>
+          </div>
+
+          <div class="workflow-card">
+            <span class="workflow-step-num">STEP 3</span>
+            <div class="workflow-icon">⚡</div>
+            <h4>3. Match</h4>
+            <p>The system computes ABO/Rh compatibility, organ availability, and precise Haversine geographic distance (in km).</p>
+          </div>
+
+          <div class="workflow-card">
+            <span class="workflow-step-num">STEP 4</span>
+            <div class="workflow-icon">📢</div>
+            <h4>4. Alert</h4>
+            <p>Top compatible nearest donors are ranked and notified instantly via the emergency dispatch gateway with distance mapping.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- College Demonstration Walkthrough Banner -->
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--secondary); display:flex; align-items:center; gap:0.5rem;">
+              🎓 College Semester Project Demonstration Flow
+            </h4>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 0.25rem;">
+              Ready for presentation to HOD, internal reviewers, external examiners, and symposium evaluation:
+            </p>
+          </div>
+          <button class="btn btn-light-outline btn-sm" onclick="LifeLinkDB.resetDatabase(); location.reload();">
+            🔄 Reset Demo Seed Data
+          </button>
+        </div>
+
+        <div style="margin-top: 1.25rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <ol style="margin-left: 1.25rem; font-size: 0.9rem; color: #334155; line-height: 1.8;">
+            <li><strong>Step 1:</strong> Explore Home Page overview, live metrics, and operational workflow.</li>
+            <li><strong>Step 2:</strong> Open <strong style="color: #dc2626;">Register Donor</strong> and add a new donor (with auto-detected GPS or manual coordinates).</li>
+            <li><strong>Step 3:</strong> Open <strong style="color: #dc2626;">Emergency Request</strong> and submit a critical patient needing O+ blood or Kidney.</li>
+            <li><strong>Step 4:</strong> Watch the system automatically query the database, apply Haversine distance, and filter compatibility.</li>
+            <li><strong>Step 5:</strong> Review the ranked donor matching cards and interactive GIS map showing patient-donor connection lines.</li>
+            <li><strong>Step 6:</strong> Trigger <strong>Dispatch Alert</strong> to simulate the emergency notification queue and inspect <strong>Alert Logs</strong>.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 2: DONOR REGISTRATION
+         ---------------------------------------------------------------------- -->
+    <section id="view-donor-register" class="view-section">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>🩸 Donor Registration Form</h2>
+          <p>Register as a voluntary blood or organ donor to join the emergency lifesaver network.</p>
+        </div>
+        <button class="btn btn-light-outline btn-sm" data-view="view-donors">
+          View All Donors →
+        </button>
+      </div>
+
+      <div class="form-card">
+        <form id="form-donor-register">
+          <div class="form-grid">
+            <!-- Full Name -->
+            <div class="form-group">
+              <label class="form-label" for="donor-name">
+                Full Name <span class="req">*</span>
+              </label>
+              <input type="text" id="donor-name" class="form-control" placeholder="e.g. Test Donor" required>
+            </div>
+
+            <!-- Blood Group -->
+            <div class="form-group">
+              <label class="form-label" for="donor-blood-group">
+                Blood Group <span class="req">*</span>
+              </label>
+              <select id="donor-blood-group" class="form-control" required>
+                <option value="">-- Select Blood Group --</option>
+                <option value="A+">A+ (A Positive)</option>
+                <option value="A-">A- (A Negative)</option>
+                <option value="B+">B+ (B Positive)</option>
+                <option value="B-">B- (B Negative)</option>
+                <option value="AB+">AB+ (AB Positive - Universal Recipient)</option>
+                <option value="AB-">AB- (AB Negative)</option>
+                <option value="O+">O+ (O Positive)</option>
+                <option value="O-">O- (O Negative - Universal Donor)</option>
+              </select>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+              <label class="form-label" for="donor-phone">
+                Phone Number <span class="req">*</span>
+                <span class="helper">10-digit mobile</span>
+              </label>
+              <input type="tel" id="donor-phone" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+            </div>
+
+            <!-- Availability -->
+            <div class="form-group">
+              <label class="form-label" for="donor-available">
+                Availability Status <span class="req">*</span>
+              </label>
+              <select id="donor-available" class="form-control" required>
+                <option value="Available" selected>Available (Ready to donate)</option>
+                <option value="Unavailable">Unavailable (Temporarily busy / recovering)</option>
+              </select>
+            </div>
+
+            <!-- Organ Donor Toggle -->
+            <div class="form-group">
+              <label class="form-label" for="donor-organ-donor">
+                Pledged Organ Donor? <span class="req">*</span>
+              </label>
+              <select id="donor-organ-donor" class="form-control" required>
+                <option value="No" selected>No (Blood Donation Only)</option>
+                <option value="Yes">Yes (Pledged Organ Donor)</option>
+              </select>
+            </div>
+
+            <!-- Organ Available (Conditional) -->
+            <div class="form-group" id="donor-organ-available-group" style="display: none;">
+              <label class="form-label" for="donor-organ-available">
+                Organ(s) Available For Donation
+              </label>
+              <input type="text" id="donor-organ-available" class="form-control" placeholder="e.g. Kidney, Cornea, Liver (or All)" value="Kidney, Cornea">
+            </div>
+
+            <!-- Location / Address -->
+            <div class="form-group full-width">
+              <label class="form-label" for="donor-location">
+                City / Hospital / Area Location <span class="req">*</span>
+              </label>
+              <input type="text" id="donor-location" class="form-control" placeholder="e.g. Coimbatore Central, Gandhipuram" required>
+            </div>
+
+            <!-- GPS Coordinates Inputs -->
+            <div class="form-group">
+              <label class="form-label" for="donor-lat">
+                Latitude <span class="req">*</span>
+                <span class="helper">Decimal degrees</span>
+              </label>
+              <input type="number" id="donor-lat" class="form-control" step="any" placeholder="e.g. 11.0168" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="donor-lon">
+                Longitude <span class="req">*</span>
+                <span class="helper">Decimal degrees</span>
+              </label>
+              <input type="number" id="donor-lon" class="form-control" step="any" placeholder="e.g. 76.9558" required>
+            </div>
+
+            <!-- Location Acquisition Toolbar -->
+            <div class="form-group full-width" style="background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <strong style="font-size: 0.88rem; color: var(--secondary);">Geographic Coordinates Assistance:</strong>
+                  <div id="donor-loc-status" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;"></div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-detect-donor-loc">
+                  📍 Detect My Location (Browser GPS)
+                </button>
+              </div>
+
+              <!-- Quick City Presets for testing -->
+              <div style="margin-top: 0.75rem;">
+                <span style="font-size: 0.78rem; font-weight: 600; color: var(--secondary-muted);">Quick Coordinates Presets:</span>
+                <div class="location-presets" id="donor-presets"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Submit Button -->
+          <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+            <button type="reset" class="btn btn-light-outline">Reset Form</button>
+            <button type="submit" class="btn btn-primary btn-lg">
+              ✓ Complete Registration & Enable Matching
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 3: EMERGENCY REQUEST
+         ---------------------------------------------------------------------- -->
+    <section id="view-emergency" class="view-section">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2 style="color: #dc2626;">🚨 Emergency Blood & Organ Request</h2>
+          <p>Create a high-priority emergency request to trigger immediate geographic matching across all registered donors.</p>
+        </div>
+        <button class="btn btn-light-outline btn-sm" data-view="view-matching">
+          View Active Matching →
+        </button>
+      </div>
+
+      <div class="form-card" style="border-top: 4px solid #dc2626;">
+        <form id="form-emergency-request">
+          <div class="form-grid">
+            <!-- Patient Name -->
+            <div class="form-group">
+              <label class="form-label" for="patient-name">
+                Patient Name <span class="req">*</span>
+              </label>
+              <input type="text" id="patient-name" class="form-control" placeholder="e.g. Rajesh Varma" required>
+            </div>
+
+            <!-- Required Blood Group -->
+            <div class="form-group">
+              <label class="form-label" for="patient-blood-group">
+                Required Blood Group <span class="req">*</span>
+              </label>
+              <select id="patient-blood-group" class="form-control" required>
+                <option value="">-- Select Required Blood Group --</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+" selected>O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+              <label class="form-label" for="patient-phone">
+                Emergency Phone Number <span class="req">*</span>
+                <span class="helper">Hospital / Attender</span>
+              </label>
+              <input type="tel" id="patient-phone" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+            </div>
+
+            <!-- Emergency Level -->
+            <div class="form-group">
+              <label class="form-label" for="patient-emergency-level">
+                Emergency Priority Level <span class="req">*</span>
+              </label>
+              <select id="patient-emergency-level" class="form-control" required>
+                <option value="Critical" selected>Critical (Immediate dispatch needed)</option>
+                <option value="Urgent">Urgent (Needed within 2-4 hours)</option>
+                <option value="Normal">Normal (Scheduled transfusion)</option>
+              </select>
+            </div>
+
+            <!-- Organ Required -->
+            <div class="form-group full-width">
+              <label class="form-label" for="patient-organ-required">
+                Organ Required (Optional - select "None" for blood transfusion only)
+              </label>
+              <select id="patient-organ-required" class="form-control">
+                <option value="None" selected>None (Blood Transfusion Only)</option>
+                <option value="Kidney">Kidney</option>
+                <option value="Liver">Liver</option>
+                <option value="Cornea">Cornea (Eye)</option>
+                <option value="Heart">Heart</option>
+                <option value="Bone Marrow">Bone Marrow</option>
+                <option value="Lungs">Lungs</option>
+              </select>
+            </div>
+
+            <!-- Location / Hospital -->
+            <div class="form-group full-width">
+              <label class="form-label" for="patient-location">
+                Patient Hospital / Current Location <span class="req">*</span>
+              </label>
+              <input type="text" id="patient-location" class="form-control" placeholder="e.g. Coimbatore Medical College Hospital (CMCH)" value="Coimbatore Medical College Hospital (CMCH)" required>
+            </div>
+
+            <!-- GPS Coordinates -->
+            <div class="form-group">
+              <label class="form-label" for="patient-lat">
+                Hospital/Patient Latitude <span class="req">*</span>
+              </label>
+              <input type="number" id="patient-lat" class="form-control" step="any" placeholder="11.0018" value="11.0018" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="patient-lon">
+                Hospital/Patient Longitude <span class="req">*</span>
+              </label>
+              <input type="number" id="patient-lon" class="form-control" step="any" placeholder="76.9629" value="76.9629" required>
+            </div>
+
+            <!-- Geolocation Assistance -->
+            <div class="form-group full-width" style="background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <strong style="font-size: 0.88rem; color: var(--secondary);">Hospital Geolocation Locator:</strong>
+                  <div id="patient-loc-status" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;"></div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-detect-patient-loc">
+                  📍 Detect Device Location
+                </button>
+              </div>
+
+              <div style="margin-top: 0.75rem;">
+                <span style="font-size: 0.78rem; font-weight: 600; color: var(--secondary-muted);">Quick Hospital/City Presets:</span>
+                <div class="location-presets" id="patient-presets"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+            <button type="reset" class="btn btn-light-outline">Clear Fields</button>
+            <button type="submit" class="btn btn-danger btn-lg">
+              🚨 Save Request & Automatically Match Donors
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 4: LIVE MATCHING & EMERGENCY ALERT RESULTS
+         ---------------------------------------------------------------------- -->
+    <section id="view-matching" class="view-section">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>⚡ Live Donor Matching & Emergency Results</h2>
+          <p>Multi-criteria algorithmic ranking based on Blood Compatibility, Organ Match, and Haversine Distance (km).</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--secondary-muted);">Emergency Case:</label>
+          <select id="select-active-request" class="form-control" style="width: auto; max-width: 380px; font-weight: 600;"></select>
+        </div>
+      </div>
+
+      <!-- Active Emergency Case Summary Banner -->
+      <div id="active-request-summary" class="request-summary-card">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Interactive GIS Geographic Map -->
+      <div class="map-card">
+        <div class="map-card-header">
+          <h4>🗺️ Geographic Proximity Map (Leaflet GIS)</h4>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">
+            🔴 Patient Location | 🟢 Top Ranked Donor | 🔵 Compatible Donors
+          </span>
+        </div>
+        <div id="map"></div>
+      </div>
+
+      <!-- Ranked Compatible Donors List -->
+      <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--secondary);">
+          MATCHING DONORS (Ranked by Compatibility, Availability & Proximity)
+        </h3>
+      </div>
+
+      <div id="matching-results-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 5: DONOR DIRECTORY
+         ---------------------------------------------------------------------- -->
+    <section id="view-donors" class="view-section">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>📋 Registered Donor Directory</h2>
+          <p>Comprehensive repository of verified blood and organ donors with real-time status.</p>
+        </div>
+        <div>
+          <button class="btn btn-primary btn-sm" data-view="view-donor-register">
+            + Register New Donor
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <!-- Toolbar & Filter Options -->
+        <div class="table-toolbar">
+          <div class="filter-group">
+            <input type="text" id="search-donors" class="form-control" placeholder="Search by name, city, phone..." style="width: 240px; padding: 0.5rem 0.75rem;">
+
+            <select id="filter-blood-group" class="form-control" style="width: auto; padding: 0.5rem 0.75rem;">
+              <option value="">All Blood Groups</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+
+            <select id="filter-organ" class="form-control" style="width: auto; padding: 0.5rem 0.75rem;">
+              <option value="">All Organ Status</option>
+              <option value="Yes">Organ Donors (Yes)</option>
+              <option value="No">Blood Only (No)</option>
+              <option value="Kidney">Kidney Donors</option>
+              <option value="Liver">Liver Donors</option>
+              <option value="Cornea">Cornea Donors</option>
+            </select>
+
+            <select id="filter-availability" class="form-control" style="width: auto; padding: 0.5rem 0.75rem;">
+              <option value="">All Availability</option>
+              <option value="Available">Available Only</option>
+              <option value="Unavailable">Unavailable Only</option>
+            </select>
+
+            <button class="btn btn-light-outline btn-sm" id="btn-reset-filters">Reset Filters</button>
+          </div>
+
+          <div id="donor-count-badge" class="badge" style="background:#f1f5f9; color:#475569; font-size:0.85rem; padding: 0.4rem 0.8rem;">
+            Loading...
+          </div>
+        </div>
+
+        <!-- Donors Table -->
+        <div style="overflow-x: auto;">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Donor Name & ID</th>
+                <th>Blood Group</th>
+                <th>Location & Coordinates</th>
+                <th>Organ Donor</th>
+                <th>Availability</th>
+                <th>Contact</th>
+                <th>Quick Action</th>
+              </tr>
+            </thead>
+            <tbody id="donors-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 6: ALERT LOGS & EMERGENCY DISPATCH
+         ---------------------------------------------------------------------- -->
+    <section id="view-alerts" class="view-section">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>🔔 Emergency Alert Audit Trail</h2>
+          <p>Chronological record of automated and manual emergency dispatch notifications sent to donors.</p>
+        </div>
+        <button class="btn btn-danger btn-sm" data-view="view-matching">
+          ← Back to Live Matching
+        </button>
+      </div>
+
+      <div style="background: white; border-radius: var(--radius-lg); padding: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+        <div id="alerts-log-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 7: HOW IT WORKS & ARCHITECTURE
+         ---------------------------------------------------------------------- -->
+    <section id="view-about" class="view-section">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>📖 System Architecture & Engineering Specifications</h2>
+          <p>Mathematical formulas, medical compatibility models, and algorithmic implementation details.</p>
+        </div>
+      </div>
+
+      <!-- Section 1: Haversine Distance Calculation -->
+      <div class="workflow-section">
+        <h3 style="font-size: 1.4rem; color: var(--secondary); margin-bottom: 0.75rem;">
+          1. Geographic Distance Calculation (Haversine Formula)
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+          The Haversine formula determines the great-circle distance between two points on a sphere given their longitudes and latitudes.
+          In LifeLink, it calculates the physical distance in kilometers between the patient’s emergency location and registered donor locations.
+        </p>
+
+        <div style="background: #0f172a; color: #f8fafc; padding: 1.5rem; border-radius: var(--radius-md); font-family: monospace; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.5rem;">
+          <div><strong>Mathematical Formulation:</strong></div>
+          <div style="color: #38bdf8; margin: 0.5rem 0;">
+            a = sin²(Δφ / 2) + cos(φ₁) ⋅ cos(φ₂) ⋅ sin²(Δλ / 2)
+          </div>
+          <div style="color: #38bdf8; margin-bottom: 0.5rem;">
+            c = 2 ⋅ atan2( √a, √(1 − a) )
+          </div>
+          <div style="color: #34d399;">
+            Distance (d) = R ⋅ c &nbsp;&nbsp;[where R = 6,371 km (Earth's mean radius)]
+          </div>
+          <div style="color: #94a3b8; font-size: 0.82rem; margin-top: 0.5rem;">
+            • φ₁ and φ₂ are latitudes of patient and donor in radians.<br>
+            • Δφ = (lat₂ - lat₁) and Δλ = (lon₂ - lon₁) in radians.
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Medical Compatibility Matrix -->
+      <div class="workflow-section">
+        <h3 style="font-size: 1.4rem; color: var(--secondary); margin-bottom: 0.75rem;">
+          2. Clinical Red Blood Cell & Organ Compatibility Matrix
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+          Transfusion safety requires strict matching of antigen-antibody interactions. The LifeLink matching algorithm enforces the medical standards:
+        </p>
+
+        <div style="overflow-x: auto;">
+          <table class="custom-table" style="font-size: 0.85rem;">
+            <thead>
+              <tr style="background: #f1f5f9;">
+                <th>Patient (Recipient) Blood Group</th>
+                <th>Permissible Donor Blood Groups</th>
+                <th>Clinical Classification</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>O-</strong></td><td><span class="badge badge-blood">O-</span></td><td>Can only receive O- (Universal RBC Donor)</td></tr>
+              <tr><td><strong>O+</strong></td><td><span class="badge badge-blood">O-</span> <span class="badge badge-blood">O+</span></td><td>Can receive O- and O+</td></tr>
+              <tr><td><strong>A-</strong></td><td><span class="badge badge-blood">O-</span> <span class="badge badge-blood">A-</span></td><td>Can receive O- and A-</td></tr>
+              <tr><td><strong>A+</strong></td><td><span class="badge badge-blood">O-</span> <span class="badge badge-blood">O+</span> <span class="badge badge-blood">A-</span> <span class="badge badge-blood">A+</span></td><td>Can receive O and A types</td></tr>
+              <tr><td><strong>B-</strong></td><td><span class="badge badge-blood">O-</span> <span class="badge badge-blood">B-</span></td><td>Can receive O- and B-</td></tr>
+              <tr><td><strong>B+</strong></td><td><span class="badge badge-blood">O-</span> <span class="badge badge-blood">O+</span> <span class="badge badge-blood">B-</span> <span class="badge badge-blood">B+</span></td><td>Can receive O and B types</td></tr>
+              <tr><td><strong>AB-</strong></td><td><span class="badge badge-blood">O-</span> <span class="badge badge-blood">A-</span> <span class="badge badge-blood">B-</span> <span class="badge badge-blood">AB-</span></td><td>Can receive all Rh-negative types</td></tr>
+              <tr><td><strong>AB+</strong></td><td><span class="badge badge-blood">All 8 Blood Types</span></td><td>Universal Recipient (Can safely receive any blood type)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 3: Priority Ranking Logic -->
+      <div class="workflow-section">
+        <h3 style="font-size: 1.4rem; color: var(--secondary); margin-bottom: 0.75rem;">
+          3. Multi-Criteria Ranking Algorithm
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+          When an emergency request is processed, donors are evaluated through a 3-tier cascade:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+          <div style="background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <strong style="color: #dc2626;">Tier 1: Availability Check</strong>
+            <p style="font-size: 0.88rem; color: #64748b; margin-top: 0.25rem;">
+              Donors with <code>available == "Available"</code> are prioritized over unavailable candidates.
+            </p>
+          </div>
+          <div style="background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <strong style="color: #0284c7;">Tier 2: Exact Match Bonus</strong>
+            <p style="font-size: 0.88rem; color: #64748b; margin-top: 0.25rem;">
+              Exact blood group matches (e.g. O+ to O+) receive higher rank preference than cross-compatible groups (e.g. O- to O+).
+            </p>
+          </div>
+          <div style="background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <strong style="color: #10b981;">Tier 3: Proximity (Distance km)</strong>
+            <p style="font-size: 0.88rem; color: #64748b; margin-top: 0.25rem;">
+              Candidates within identical compatibility tiers are sorted in ascending order of Haversine distance.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         VIEW 8: DATABASE INSPECTOR (FOR HOD / FACULTY REVIEW)
+         ---------------------------------------------------------------------- -->
+    <section id="view-database" class="view-section">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>🗄️ Relational Database Inspector & Tools</h2>
+          <p>Examine raw table schemas, verify persistent data integrity, and export database state.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-secondary btn-sm" id="btn-export-db">
+            💾 Export Database (JSON)
+          </button>
+          <button class="btn btn-danger btn-sm" id="btn-reset-db">
+            🔄 Reset Demo Seed Data
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <!-- Donors Table Raw -->
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+          <h4 style="font-size: 1.1rem; color: var(--secondary); margin-bottom: 0.5rem; display:flex; justify-content:space-between;">
+            <span>DONOR TABLE (Schema: <code>id, name, blood_group, phone, location, organ_donor, organ_available, available, latitude, longitude</code>)</span>
+          </h4>
+          <pre id="db-donors-json" style="background: #0f172a; color: #38bdf8; padding: 1rem; border-radius: var(--radius-md); font-size: 0.8rem; max-height: 250px; overflow-y: auto; font-family: monospace;"></pre>
+        </div>
+
+        <!-- Requests Table Raw -->
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+          <h4 style="font-size: 1.1rem; color: var(--secondary); margin-bottom: 0.5rem;">
+            PATIENT / EMERGENCY REQUEST TABLE (Schema: <code>id, patient_name, blood_group, phone, location, organ_required, emergency, status, latitude, longitude</code>)
+          </h4>
+          <pre id="db-requests-json" style="background: #0f172a; color: #34d399; padding: 1rem; border-radius: var(--radius-md); font-size: 0.8rem; max-height: 200px; overflow-y: auto; font-family: monospace;"></pre>
+        </div>
+
+        <!-- Alerts Table Raw -->
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+          <h4 style="font-size: 1.1rem; color: var(--secondary); margin-bottom: 0.5rem;">
+            EMERGENCY ALERT AUDIT TABLE (Schema: <code>id, request_id, donor_id, donor_name, phone, distanceKm, channel, status, timestamp</code>)
+          </h4>
+          <pre id="db-alerts-json" style="background: #0f172a; color: #fca5a5; padding: 1rem; border-radius: var(--radius-md); font-size: 0.8rem; max-height: 200px; overflow-y: auto; font-family: monospace;"></pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       Emergency Alert Modal
+       ======================================================================== -->
+  <div id="alert-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🚨 Dispatch Emergency Alert Gateway</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="alert-modal-body">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light-outline modal-cancel">Cancel</button>
+        <button class="btn btn-danger" id="btn-confirm-broadcast">
+          ✓ Confirm & Transmit Alerts
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Toast Notification Container
+       ======================================================================== -->
+  <div id="toast-container"></div>
+
+  <!-- ========================================================================
+       Footer
+       ======================================================================== -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; color: white; font-weight: 800; font-size: 1.1rem; margin-bottom: 0.4rem;">
+          <span>🩸 LifeLink Emergency System</span>
+        </div>
+        <p style="max-width: 500px; font-size: 0.85rem; color: #94a3b8;">
+          College Semester Project: Location-Based Blood & Organ Donor Matching and Emergency Alert System.
+          Engineered for rapid humanitarian emergency intervention and GIS proximity optimization.
+        </p>
+      </div>
+      <div style="text-align: right;">
+        <div style="color: white; font-weight: 600; margin-bottom: 0.25rem;">Project Documentation</div>
+        <div style="font-size: 0.8rem; color: #64748b;">Autonomous Relational Database • Haversine GIS • Full Compatibility Engine</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>LifeLink Healthcare Informatics &copy; 2026. All rights reserved.</div>
+      <div>Designed for Semester Project Review, HOD Evaluation, and Technical Symposia.</div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       Scripts
+       ======================================================================== -->
+  <!-- Leaflet GIS Map Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- LifeLink Core JavaScript Modules -->
+  <script src="js/matching.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
