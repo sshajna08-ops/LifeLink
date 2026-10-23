@@ -18,7 +18,7 @@ const LifeLinkDB = (() => {
   }
 
   function addDonor(donor) {
-    const donors = read(KEYS.donors);
+    const donors = getAllDonors();
     const newDonor = {
       id: Date.now(),
       ...donor,
@@ -33,8 +33,25 @@ const LifeLinkDB = (() => {
     return read(KEYS.donors);
   }
 
+  function getDonorById(id) {
+    return getAllDonors().find(d => String(d.id) === String(id));
+  }
+
+  function updateDonor(id, updates) {
+    const donors = getAllDonors();
+    const index = donors.findIndex(
+      d => String(d.id) === String(id)
+    );
+
+    if (index === -1) return null;
+
+    donors[index] = { ...donors[index], ...updates };
+    write(KEYS.donors, donors);
+    return donors[index];
+  }
+
   function addRequest(request) {
-    const requests = read(KEYS.requests);
+    const requests = getAllRequests();
     const newRequest = {
       id: Date.now(),
       ...request,
@@ -54,7 +71,7 @@ const LifeLinkDB = (() => {
   }
 
   function addAlert(alert) {
-    const alerts = read(KEYS.alerts);
+    const alerts = getAllAlerts();
     const newAlert = {
       id: Date.now(),
       ...alert,
@@ -87,12 +104,16 @@ const LifeLinkDB = (() => {
   }
 
   function resetDatabase() {
-    Object.values(KEYS).forEach(key => localStorage.removeItem(key));
+    Object.values(KEYS).forEach(key =>
+      localStorage.removeItem(key)
+    );
   }
 
   return {
     addDonor,
     getAllDonors,
+    getDonorById,
+    updateDonor,
     addRequest,
     getAllRequests,
     getAllAlerts,
