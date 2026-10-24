@@ -824,8 +824,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('alert-modal');
     const modalBody = document.getElementById('alert-modal-body');
     const modalConfirmBtn = document.getElementById('btn-confirm-broadcast');
-    if (!modal || !modalBody) return;
 
+if (!modal || !modalBody || !modalConfirmBtn) {
+  console.error('Broadcast modal elements missing.');
+  return;
+}
     modalBody.innerHTML = `
       <div style="background:#fee2e2; border-left:4px solid #dc2626; padding:0.75rem 1rem; border-radius:6px; margin-bottom:1rem;">
         <strong style="color:#b91c1c;">Emergency Protocol Confirmation</strong>
